@@ -63,21 +63,25 @@ class Points:
         self.bot = bot
         with open("points.json") as file:
             self.data = json.load(file)
-        self.users = {int(uid): MyUser(**data) for uid, data in
-                      self.data.pop("users").items()}  # type: typing.Dict[str,MyUser]
-        self.bot.loop.create_task(self.background_task())
+        if self.data:
+            self.users = {int(uid): MyUser(**data) for uid, data in
+                          self.data.pop("users").items()}  # type: typing.Dict[str,MyUser]
+        else:
+            self.users = {}
+        self.task: asyncio.Task = self.bot.loop.create_task(self.background_task())
+
+    def __unload(self):
+        self.task.cancel()
 
     async def __local_check(self, ctx):
         return ctx.guild
 
     async def __error(self, ctx, error):
-        error = getattr(error, "original", error)
-        if isinstance(error, commands.CheckFailure):
-            return await ctx.send("This command requires the ``ThankBotAdmin`` role to use. ")
+        pass
 
     @property
     def maxtokens(self):
-        return self.data['max_tokens']
+        return self.data.get('max_tokens')
 
     @maxtokens.setter
     def maxtokens(self, value):
@@ -85,7 +89,7 @@ class Points:
 
     @property
     def losepoints(self):
-        return self.data['lose_points']
+        return self.data.get('lose_points')
 
     @losepoints.setter
     def losepoints(self, value):
@@ -93,7 +97,7 @@ class Points:
 
     @property
     def maxpoints(self):
-        return self.data['max_points']
+        return self.data.get('max_points')
 
     @maxpoints.setter
     def maxpoints(self, value):
@@ -194,7 +198,7 @@ class Points:
             except:
                 pass
             try:
-                await target.send(f"You've recieved a Thank Point from {ctx.author}\n"
+                await target.send(f"You've received a Thank Point from {ctx.author}\n"
                                   f"You have {target_data.points} Total.")
             except:
                 pass
@@ -221,6 +225,7 @@ class Points:
 
     @commands.command(name="leaders")
     @commands.cooldown(10, 5)
+    @thankbot()
     async def leaderboard(self, ctx):
         if not self.users:
             return await ctx.send("No data found")
@@ -231,14 +236,6 @@ class Points:
             return f"{target.display_name} : **{self.users[user].points}** Points"
 
         await ctx.send("\n".join([get_string(user) for user in data if ctx.guild.get_member(user)]))
-
-    @commands.command()
-    @commands.is_owner()
-    async def mlostpoints(self, ctx):
-        for user in self.users.values():
-            user.refresh(self.maxtokens, self.losepoints)
-            self.save_database()
-        await ctx.send("done")
 
 
 def setup(bot):
