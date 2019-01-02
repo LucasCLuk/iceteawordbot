@@ -29,7 +29,6 @@ with open("config.json") as file:
     data = json.load(file)
     token = data['token']
     sentry = None
-    # sentry = raven.Client(transport=AioHttpTransport, dsn=data['sentry'])
 
 for ext in extensions:
     bot.load_extension(ext)
