@@ -69,6 +69,17 @@ class Administration:
         except:
             pass
 
+    @commands.command()
+    async def nick(self, ctx, newnick):
+        await ctx.me.edit(nick=newnick)
+        await ctx.send("Success!")
+
+    @commands.command()
+    async def reload(self, ctx, target: str):
+        ctx.bot.unload_extension(target)
+        ctx.bot.load_extension(target)
+        await ctx.send("\U0001f44d")
+
 
 def setup(bot):
     bot.add_cog(Administration())
