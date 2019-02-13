@@ -14,10 +14,11 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx, error):
+    error = getattr(error, "original", error)
     if isinstance(error, (commands.BadArgument, commands.CheckFailure)):
         return
     if sentry:
-        sentry.capture('raven.events.Message', message=str(getattr(error, "original", error)), extra={
+        sentry.capture('raven.events.Message', message=str(error), extra={
             'command': ctx.invoked_with,
             "user": str(ctx.author),
             "traceback": traceback.format_tb(error.__traceback__),
