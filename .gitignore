@@ -60,3 +60,7 @@ target/
 \.idea/
 
 *.json
+
+deploy\.sh
+
+id_rsa
