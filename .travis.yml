@@ -17,6 +17,6 @@ deploy:
     branch: master
 before_install:
   - openssl aes-256-cbc -K $encrypted_d80d8c724d57_key -iv $encrypted_d80d8c724d57_iv
-    -in id_rsa.enc -out id_rsa -d
-  - openssl aes-256-cbc -K $encrypted_d80d8c724d57_key -iv $encrypted_d80d8c724d57_iv
     -in deploy.sh.enc -out deploy.sh -d
+  - openssl aes-256-cbc -K $encrypted_d80d8c724d57_key -iv $encrypted_d80d8c724d57_iv
+    -in id_rsa.enc -out id_rsa -d
