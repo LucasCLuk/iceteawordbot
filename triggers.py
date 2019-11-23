@@ -7,16 +7,20 @@ from discord.ext import commands
 class Triggers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("triggers.json") as triggers_files:
-            try:
-                self.triggers = json.load(triggers_files)
-            except:
-                self.triggers = {}
+        try:
+            with open("data/triggers.json", "r") as triggers_files:
+                try:
+                    self.triggers = json.load(triggers_files)
+                except:
+                    self.triggers = {}
+        except FileNotFoundError:
+            self.triggers = {}
 
     async def cog_check(self, ctx):
         permissions = ctx.channel.permissions_for(ctx.me)
         has_role = discord.utils.get(ctx.author.roles, name="Iceteabot Admin")
         return any([all([has_role, permissions.send_messages]), ctx.author.id == 92730223316959232])
+
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -32,25 +36,24 @@ class Triggers(commands.Cog):
     @trigger.command()
     async def add(self, ctx, word, *, response):
         try:
-            with open("triggers.json") as add_file:
-                new_dict = json.load(add_file)
+            with open("triggers.json", "w+") as file:
+                new_dict = json.load(file)
                 new_dict[word.lower()] = response
                 self.triggers[word.lower()] = response
-            with open("triggers.json", "w") as save_file:
-                json.dump(self.triggers, save_file)
+                json.dump(self.triggers, file)
                 await ctx.send("Successfully added trigger")
         except Exception as e:
             print(e)
+            await ctx.send(e, delete_after=10)
 
     @trigger.command()
     async def remove(self, ctx, *, word):
         try:
-            with open("triggers.json") as add_file:
-                new_dict = json.load(add_file)
+            with open("triggers.json", "w+") as file:
+                new_dict = json.load(file)
                 del new_dict[word.lower()]
                 del self.triggers[word.lower()]
-                with open("triggers.json", "w") as save_file:
-                    json.dump(self.triggers, save_file)
+                json.dump(self.triggers, file)
                 await ctx.send("Successfully removed trigger")
         except Exception as e:
             print(e)

@@ -1,10 +1,8 @@
-import asyncio
-import datetime
 import json
 import typing
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 
 def thankbot():
@@ -61,17 +59,23 @@ class MyUser:
 class Points(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("points.json") as file:
-            self.data = json.load(file)
+        try:
+            with open("data/points.json", "r") as file:
+                try:
+                    self.data = json.load(file)
+                except:
+                    self.data = {}
+        except FileNotFoundError:
+            self.data = {}
         if self.data:
             self.users = {int(uid): MyUser(**data) for uid, data in
                           self.data.pop("users").items()}  # type: typing.Dict[str,MyUser]
         else:
             self.users = {}
-        self.task: asyncio.Task = self.bot.loop.create_task(self.background_task())
+        self.database_manager.start()
 
     def cog_unload(self):
-        self.task.cancel()
+        self.database_manager.cancel()
 
     async def cog_check(self, ctx):
         return ctx.guild
@@ -124,7 +128,7 @@ class Points(commands.Cog):
         return False
 
     def save_database(self):
-        with open("points.json", "w") as file:
+        with open("points.json", "w+") as file:
             data = {
                 "max_tokens": self.maxtokens,
                 "lose_points": self.losepoints,
@@ -133,20 +137,15 @@ class Points(commands.Cog):
             }
             json.dump(data, file, indent=2)
 
-    @staticmethod
-    def time_sleep():
-        tomorrow = datetime.datetime.now() + datetime.timedelta(1)
-        midnight = datetime.datetime(year=tomorrow.year, month=tomorrow.month,
-                                     day=tomorrow.day, hour=0, minute=0, second=0)
-        return (midnight - datetime.datetime.now()).seconds
+    @tasks.loop(hours=24)
+    async def database_manager(self):
+        for user in self.users.values():
+            user.refresh(self.maxtokens, self.losepoints)
+            self.save_database()
 
-    async def background_task(self):
+    @database_manager.before_loop
+    async def before_database_manager(self):
         await self.bot.wait_until_ready()
-        while not self.bot.is_closed():
-            await asyncio.sleep(self.time_sleep())
-            for user in self.users.values():
-                user.refresh(self.maxtokens, self.losepoints)
-                self.save_database()
 
     @thankbot()
     @commands.command(name="maxtokens")

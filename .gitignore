@@ -58,11 +58,4 @@ docs/_build/
 target/
 
 \.idea/
-
-*.json
-
-deploy\.sh
-
-id_rsa
-
-secrets\.tar
+!/data/

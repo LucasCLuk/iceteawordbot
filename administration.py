@@ -75,7 +75,16 @@ class Administration(commands.Cog):
 
     @commands.command()
     async def reload(self, ctx, target: str):
+        ctx.bot.reload_extension(target)
+        await ctx.send("\U0001f44d")
+
+    @commands.command()
+    async def unload(self, ctx, target: str):
         ctx.bot.unload_extension(target)
+        await ctx.send("\U0001f44d")
+
+    @commands.command()
+    async def load(self, ctx, target: str):
         ctx.bot.load_extension(target)
         await ctx.send("\U0001f44d")
 
