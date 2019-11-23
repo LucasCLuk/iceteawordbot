@@ -6,8 +6,8 @@ from discord.ext import commands, tasks
 
 
 def thankbot():
-    def predicate(ctx):
-        return discord.utils.get(ctx.author.roles, name="ThankBotAdmin") or ctx.author.id == 92730223316959232
+    async def predicate(ctx):
+        return discord.utils.get(ctx.author.roles, name="ThankBotAdmin") or await ctx.bot.is_owner(ctx.author)
 
     return commands.check(predicate)
 

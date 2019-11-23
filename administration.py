@@ -20,7 +20,7 @@ class Administration(commands.Cog):
 
     async def cog_check(self, ctx):
         return discord.utils.get(ctx.author.roles,
-                                 name="ThankBotAdmin") or ctx.author.id == 92730223316959232
+                                 name="ThankBotAdmin") or await ctx.bot.is_owner(ctx.author)
 
     async def cog_command_error(self, ctx, error):
         error = getattr(error, "original", error)

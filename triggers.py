@@ -19,7 +19,7 @@ class Triggers(commands.Cog):
     async def cog_check(self, ctx):
         permissions = ctx.channel.permissions_for(ctx.me)
         has_role = discord.utils.get(ctx.author.roles, name="Iceteabot Admin")
-        return any([all([has_role, permissions.send_messages]), ctx.author.id == 92730223316959232])
+        return any([all([has_role, permissions.send_messages]), await ctx.bot.is_owner(ctx.author)])
 
 
     @commands.Cog.listener()
