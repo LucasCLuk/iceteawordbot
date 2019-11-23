@@ -16,14 +16,13 @@ def require_attachment():
     return commands.check(predicate)
 
 
-class Administration:
+class Administration(commands.Cog):
 
-    @staticmethod
-    async def __local_check(ctx):
+    async def cog_check(self, ctx):
         return discord.utils.get(ctx.author.roles,
                                  name="ThankBotAdmin") or ctx.author.id == 92730223316959232
 
-    async def __error(self, ctx, error):
+    async def cog_command_error(self, ctx, error):
         error = getattr(error, "original", error)
         if isinstance(error, NoAttachmentsFound):
             return await ctx.send("I could not get any data, did you upload an attachment?")

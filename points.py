@@ -58,7 +58,7 @@ class MyUser:
         target.points += 1
 
 
-class Points:
+class Points(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         with open("points.json") as file:
@@ -70,13 +70,13 @@ class Points:
             self.users = {}
         self.task: asyncio.Task = self.bot.loop.create_task(self.background_task())
 
-    def __unload(self):
+    def cog_unload(self):
         self.task.cancel()
 
-    async def __local_check(self, ctx):
+    async def cog_check(self, ctx):
         return ctx.guild
 
-    async def __error(self, ctx, error):
+    async def cog_command_error(self, ctx, error):
         pass
 
     @property

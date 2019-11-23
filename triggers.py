@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 
-class Triggers:
+class Triggers(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         with open("triggers.json") as triggers_files:
@@ -13,11 +13,12 @@ class Triggers:
             except:
                 self.triggers = {}
 
-    async def __local_check(self, ctx):
+    async def cog_check(self, ctx):
         permissions = ctx.channel.permissions_for(ctx.me)
         has_role = discord.utils.get(ctx.author.roles, name="Iceteabot Admin")
         return any([all([has_role, permissions.send_messages]), ctx.author.id == 92730223316959232])
 
+    @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if not message.author.bot:
             for word in self.triggers:
