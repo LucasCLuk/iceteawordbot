@@ -34,7 +34,7 @@ class Triggers(commands.Cog):
         pass
 
     @trigger.command()
-    async def add(self, ctx, word, *, response):
+    async def add(self, ctx, word, *, response: commands.clean_content(fix_channel_mentions=True)):
         try:
             with open("triggers.json", "w+") as file:
                 new_dict = json.load(file)

@@ -1,4 +1,5 @@
 import os
+import sys
 import traceback
 
 import discord
@@ -9,7 +10,7 @@ from raven_aiohttp import AioHttpTransport
 
 client = Client(transport=AioHttpTransport)
 
-bot = commands.Bot(command_prefix=os.getenv('discord_prefix', "!"), case_insensitive=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(os.getenv('discord_prefix', "!")), case_insensitive=True)
 extensions = ["triggers", "points", "administration"]
 
 
@@ -34,6 +35,9 @@ async def on_command_error(ctx, error):
             "traceback": traceback.format_tb(error.__traceback__),
             "args": ctx.args[2:]
         })
+    else:
+        print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 
 token = os.getenv('discord_token')

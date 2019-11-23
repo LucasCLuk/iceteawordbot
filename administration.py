@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 
-class NoAttachmentsFound:
+class NoAttachmentsFound(commands.CheckFailure):
     pass
 
 
@@ -11,7 +11,7 @@ def require_attachment():
         if ctx.message.attachments:
             return True
         else:
-            raise NoAttachmentsFound
+            raise NoAttachmentsFound()
 
     return commands.check(predicate)
 
